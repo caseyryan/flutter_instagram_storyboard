@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_instagram_storyboard/flutter_instagram_storyboard.dart';
+import 'package:flutter_instagram_storyboard/src/story_page_3d_transform.dart';
+
+import 'story_route.dart';
+
+const int kStoryTimerTickMillis = 50; 
 
 class StoryButtonData {
   /// This affects a border around button
   /// after the story was watched the border will
   /// disappear
   bool isWatched = false;
+  int currentSegmentIndex = 0;
   final Curve? pageAnimationCurve;
   final Duration? pageAnimationDuration;
   final double aspectRatio;
@@ -17,18 +22,29 @@ class StoryButtonData {
   final Widget child;
   final List<Widget> storyPages;
   final Widget? closeButton;
+  final Duration segmentDuration;
+  final BoxDecoration containerBackgroundDecoration;
+  final Color timelineFillColor;
+  final Color timelineBackgroundColor;
 
   StoryButtonData({
     this.aspectRatio = 1.0,
     this.inkFeatureFactory,
     this.pageAnimationCurve,
     this.pageAnimationDuration,
+    this.timelineFillColor = Colors.white,
+    // this.timelineBackgroundColor = const Color.fromARGB(209, 255, 255, 255),
+    this.timelineBackgroundColor = Colors.red,
     this.closeButton,
     this.storyPageDecoration = const BoxDecoration(
       color: Color.fromARGB(255, 226, 226, 226),
     ),
     required this.storyPages,
     required this.child,
+    required this.segmentDuration,
+    this.containerBackgroundDecoration = const BoxDecoration(
+      color: Color.fromARGB(255, 0, 0, 0),
+    ),
     this.buttonDecoration = const BoxDecoration(
       borderRadius: const BorderRadius.all(
         Radius.circular(12.0),
@@ -47,15 +63,27 @@ class StoryButtonData {
       ),
     ),
     this.borderOffset = 2.0,
-  });
+  }) : assert(
+          segmentDuration.inMilliseconds % kStoryTimerTickMillis == 0 &&
+              segmentDuration.inMilliseconds >= 1000,
+          'Segment duration in milliseconds must be a ' +
+              'multiple of $kStoryTimerTickMillis and not less than 1000 milliseconds',
+        );
 }
 
 class StoryButton extends StatefulWidget {
   final StoryButtonData buttonData;
 
+  /// [allButtonDatas] required to be able to page thru
+  /// all stories
+  final List<StoryButtonData> allButtonDatas;
+  final IStoryPageTransform? pageTransform;
+
   const StoryButton({
     Key? key,
     required this.buttonData,
+    required this.allButtonDatas,
+    this.pageTransform,
   }) : super(key: key);
 
   @override
@@ -84,6 +112,8 @@ class _StoryButtonState extends State<StoryButton> {
         tapPosition: tapPosition,
         curve: widget.buttonData.pageAnimationCurve,
         duration: widget.buttonData.pageAnimationDuration,
+        allButtonDatas: widget.allButtonDatas,
+        pageTransform: widget.pageTransform,
       ),
     );
   }

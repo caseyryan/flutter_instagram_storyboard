@@ -29,6 +29,18 @@ class StoryExample extends StatefulWidget {
 }
 
 class _StoryExampleState extends State<StoryExample> {
+  Widget _createDummyPage({
+    required String text,
+    required Color color,
+  }) {
+    return Container(
+      color: color,
+      child: Center(
+        child: Text(text),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,19 +54,71 @@ class _StoryExampleState extends State<StoryExample> {
             buttonDatas: [
               StoryButtonData(
                 child: SizedBox(),
-                storyPages: [],
+                storyPages: [
+                  _createDummyPage(
+                    text: 'Story 1, page 1',
+                    color: Colors.blueAccent,
+                  ),
+                  _createDummyPage(
+                    text: 'Story 1, page 2',
+                    color: Colors.pink,
+                  ),
+                  _createDummyPage(
+                    text: 'Story 1, page 3',
+                    color: Colors.green,
+                  ),
+                ],
+                segmentDuration: Duration(seconds: 3),
               ),
               StoryButtonData(
                 child: SizedBox(),
-                storyPages: [],
+                storyPages: [
+                  _createDummyPage(
+                    text: 'Story 2, page 1',
+                    color: Colors.amber,
+                  ),
+                  _createDummyPage(
+                    text: 'Story 2, page 2',
+                    color: Colors.blue,
+                  ),
+                ],
+                segmentDuration: Duration(seconds: 3),
               ),
               StoryButtonData(
                 child: SizedBox(),
-                storyPages: [],
+                storyPages: [
+                  _createDummyPage(
+                    text: 'Story 3, page 1',
+                    color: Colors.blueAccent,
+                  ),
+                  _createDummyPage(
+                    text: 'Story 3, page 2',
+                    color: Colors.pink,
+                  ),
+                  _createDummyPage(
+                    text: 'Story 3, page 3',
+                    color: Colors.pinkAccent,
+                  ),
+                  _createDummyPage(
+                    text: 'Story 3, page 4',
+                    color: Colors.green,
+                  ),
+                ],
+                segmentDuration: Duration(seconds: 3),
               ),
               StoryButtonData(
                 child: SizedBox(),
-                storyPages: [],
+                storyPages: [
+                  _createDummyPage(
+                    text: 'Story 4, page 1',
+                    color: Colors.amber,
+                  ),
+                  _createDummyPage(
+                    text: 'Story 4, page 2',
+                    color: Colors.blue,
+                  ),
+                ],
+                segmentDuration: Duration(seconds: 3),
               ),
             ],
           ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_instagram_storyboard/src/story_button.dart';
+import 'package:flutter_instagram_storyboard/src/story_page_3d_transform.dart';
 
 class StoryListView extends StatelessWidget {
   final List<StoryButtonData> buttonDatas;
@@ -9,6 +10,7 @@ class StoryListView extends StatelessWidget {
   final double paddingTop;
   final double paddingBottom;
   final ScrollPhysics? physics;
+  final IStoryPageTransform? pageTransform;
 
   const StoryListView({
     Key? key,
@@ -19,6 +21,7 @@ class StoryListView extends StatelessWidget {
     this.paddingTop = 10.0,
     this.paddingBottom = 10.0,
     this.physics,
+    this.pageTransform,
   }) : super(key: key);
 
   @override
@@ -44,6 +47,7 @@ class StoryListView extends StatelessWidget {
               ),
               child: StoryButton(
                 buttonData: buttonData,
+                allButtonDatas: buttonDatas,
               ),
             );
           },
