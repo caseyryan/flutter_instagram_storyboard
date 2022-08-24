@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_instagram_storyboard/src/story_button.dart';
-import 'package:flutter_instagram_storyboard/src/story_page_3d_transform.dart';
+import 'package:flutter_instagram_storyboard/src/story_page_transform.dart';
 
-class StoryListView extends StatelessWidget {
+import 'story_route.dart';
+
+class StoryListView extends StatefulWidget {
   final List<StoryButtonData> buttonDatas;
   final double buttonSpacing;
   final double paddingLeft;
@@ -11,6 +13,8 @@ class StoryListView extends StatelessWidget {
   final double paddingBottom;
   final ScrollPhysics? physics;
   final IStoryPageTransform? pageTransform;
+  final bool safeAreaTop;
+  final bool safeAreaBottom;
 
   const StoryListView({
     Key? key,
@@ -22,7 +26,43 @@ class StoryListView extends StatelessWidget {
     this.paddingBottom = 10.0,
     this.physics,
     this.pageTransform,
+    this.safeAreaTop = true,
+    this.safeAreaBottom = true,
   }) : super(key: key);
+
+  @override
+  State<StoryListView> createState() => _StoryListViewState();
+}
+
+class _StoryListViewState extends State<StoryListView> {
+  ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void _onButtonPressed(StoryButtonData buttonData) {
+    Navigator.of(context).push(
+      StoryRoute(
+        storyContainerSettings: StoryContainerSettings(
+          buttonData: buttonData,
+          tapPosition: buttonData.buttonCenterPosition!,
+          curve: buttonData.pageAnimationCurve,
+          allButtonDatas: widget.buttonDatas,
+          pageTransform: widget.pageTransform,
+          storyListScrollController: _scrollController,
+        ),
+        duration: buttonData.pageAnimationDuration,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,28 +70,32 @@ class StoryListView extends StatelessWidget {
       height: 120.0,
       child: Padding(
         padding: EdgeInsets.only(
-          top: paddingTop,
-          bottom: paddingBottom,
+          top: widget.paddingTop,
+          bottom: widget.paddingBottom,
         ),
         child: ListView.builder(
-          physics: physics,
+          controller: _scrollController,
+          physics: widget.physics,
           scrollDirection: Axis.horizontal,
           itemBuilder: (c, int index) {
-            final isLast = index == buttonDatas.length - 1;
+            final isLast = index == widget.buttonDatas.length - 1;
             final isFirst = index == 0;
-            final buttonData = buttonDatas[index];
+            final buttonData = widget.buttonDatas[index];
             return Padding(
               padding: EdgeInsets.only(
-                left: isFirst ? paddingLeft : 0.0,
-                right: isLast ? paddingRight : buttonSpacing,
+                left: isFirst ? widget.paddingLeft : 0.0,
+                right: isLast ? widget.paddingRight : widget.buttonSpacing,
               ),
               child: StoryButton(
                 buttonData: buttonData,
-                allButtonDatas: buttonDatas,
+                allButtonDatas: widget.buttonDatas,
+                pageTransform: widget.pageTransform,
+                storyListViewController: _scrollController,
+                onPressed: _onButtonPressed,
               ),
             );
           },
-          itemCount: buttonDatas.length,
+          itemCount: widget.buttonDatas.length,
         ),
       ),
     );

@@ -1,45 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_instagram_storyboard/flutter_instagram_storyboard.dart';
+import 'package:flutter_instagram_storyboard/src/first_build_mixin.dart';
+import 'package:flutter_instagram_storyboard/src/set_state_after_frame_mixin.dart';
 
-import 'story_button.dart';
-import 'story_page_3d_transform.dart';
 import 'story_page_container_view.dart';
 
 class StoryPageContainerBuilder extends StatefulWidget {
-  final StoryButtonData buttonData;
-  final List<StoryButtonData> allButtonDatas;
-  final Offset tapPosition;
   final Animation<double> animation;
-  final Curve? curve;
-  final IStoryPageTransform? pageTransform;
+  final StoryContainerSettings settings;
 
   const StoryPageContainerBuilder({
     Key? key,
-    required this.buttonData,
-    required this.allButtonDatas,
-    required this.tapPosition,
+    required this.settings,
     required this.animation,
-    required this.curve,
-    this.pageTransform,
   }) : super(key: key);
 
   @override
   State<StoryPageContainerBuilder> createState() => _StoryPageContainerBuilderState();
 }
 
-class _StoryPageContainerBuilderState extends State<StoryPageContainerBuilder> {
+class _StoryPageContainerBuilderState extends State<StoryPageContainerBuilder>
+    with SetStateAfterFrame, FirstBuildMixin {
   late PageController _pageController;
   late IStoryPageTransform _storyPageTransform;
+  static const double kMaxPageOverscroll = .2;
   int _currentPage = 0;
   double _pageDelta = 0.0;
+  double _bgOpacityControlValue = 0.0;
   double _totalWidth = 0.0;
   double _pageWidth = 0.0;
   bool _isClosed = false;
 
   @override
   void initState() {
-    _storyPageTransform = widget.pageTransform ?? StoryPage3DTransform();
-    _currentPage = widget.allButtonDatas.indexOf(
-      widget.buttonData,
+    _storyPageTransform = widget.settings.pageTransform ?? StoryPage3DTransform();
+    _currentPage = widget.settings.allButtonDatas.indexOf(
+      widget.settings.buttonData,
     );
     _pageController = PageController(
       initialPage: _currentPage,
@@ -49,13 +45,14 @@ class _StoryPageContainerBuilderState extends State<StoryPageContainerBuilder> {
         _currentPage = _pageController.page!.floor();
         _pageDelta = _pageController.page! - _currentPage;
         final isFirst = _currentPage == 0;
-        final isLast = _currentPage == widget.allButtonDatas.length - 1;
+        final isLast = _currentPage == widget.settings.allButtonDatas.length - 1;
         if (isFirst) {
           final offset = _pageController.offset;
           if (offset < 0) {
             _pageDelta = 1.0 - (offset.abs() / _pageWidth);
+            _bgOpacityControlValue = 1.0 - _pageDelta;
             _currentPage = -1;
-            if (_pageDelta <= .8) {
+            if (_pageDelta <= 1.0 - kMaxPageOverscroll) {
               _close();
             }
           }
@@ -63,32 +60,67 @@ class _StoryPageContainerBuilderState extends State<StoryPageContainerBuilder> {
           final offset = _totalWidth - _pageController.offset;
           if (offset < 0) {
             _pageDelta = (offset.abs() / _pageWidth);
-            if (_pageDelta > .2) {
+            _bgOpacityControlValue = _pageDelta;
+            if (_pageDelta > kMaxPageOverscroll) {
               _close();
             }
           }
         }
+        _scrollToActiveButton();
+        if (_isClosed) {
+          _bgOpacityControlValue = 1.0;
+        }
       });
     });
-    _widgetsBinding?.addPostFrameCallback((timeStamp) {
-      _afterFirstBuild();
-    });
+
     super.initState();
+  }
+
+  @override
+  void didFirstBuildFinish(BuildContext context) {
+    _afterFirstBuild();
+  }
+
+  /// This code calculates the position of the story button
+  /// relative to the screen and if it's beyond the screen
+  /// scrolls the button list in a way that a target button is
+  /// always visible. Thus the story will always pop out to
+  /// its corresponding button
+  void _scrollToActiveButton() {
+    if (widget.settings.storyListScrollController.hasClients) {
+      final leftPos = _activeButtonData.buttonLeftPosition?.dx;
+      final rightPos = _activeButtonData.buttonRightPosition?.dx;
+      const additionalMargin = 12.0;
+      if (leftPos != null && rightPos != null) {
+        final curScrollPosition =
+            widget.settings.storyListScrollController.position.pixels;
+
+        if (leftPos < 0.0) {
+          widget.settings.storyListScrollController.jumpTo(
+            curScrollPosition + leftPos - additionalMargin,
+          );
+        } else if (rightPos >= _pageWidth) {
+          final rightOverlap = rightPos - _pageWidth;
+          widget.settings.storyListScrollController.jumpTo(
+            curScrollPosition + rightOverlap + additionalMargin,
+          );
+        }
+      }
+    }
   }
 
   Future _close() async {
     if (_isClosed) {
       return;
     }
-
+    _bgOpacityControlValue = 1.0;
     if (mounted) {
       _isClosed = true;
-      setState(() {});
-      await Future.delayed(const Duration(
-        milliseconds: 400,
-      ));
+      safeSetState(() {});
       if (mounted) {
-        Navigator.of(context).pop();
+        Navigator.of(context).pop(
+          widget.settings.buttonData,
+        );
       }
     }
   }
@@ -96,19 +128,14 @@ class _StoryPageContainerBuilderState extends State<StoryPageContainerBuilder> {
   void _afterFirstBuild() {
     if (mounted) {
       _pageWidth = context.size!.width;
-      _totalWidth = _pageWidth * (widget.allButtonDatas.length - 1);
+      _totalWidth = _pageWidth * (widget.settings.allButtonDatas.length - 1);
     }
   }
 
-  /// a little hack to avoid warning on flutter < 3.0
-  dynamic get _widgetsBinding {
-    return WidgetsBinding.instance;
-  }
-
   Future _onStoryComplete() async {
-    if (_curPage < widget.allButtonDatas.length - 1) {
+    if (_curPageIndex < widget.settings.allButtonDatas.length - 1) {
       _pageController.animateToPage(
-        _curPage + 1,
+        _curPageIndex + 1,
         duration: kThemeAnimationDuration,
         curve: Curves.linear,
       );
@@ -117,8 +144,15 @@ class _StoryPageContainerBuilderState extends State<StoryPageContainerBuilder> {
     }
   }
 
-  int get _curPage {
+  int get _curPageIndex {
+    if (!_pageController.hasClients) {
+      return _currentPage;
+    }
     return _pageController.page?.floor() ?? 0;
+  }
+
+  StoryButtonData get _activeButtonData {
+    return widget.settings.allButtonDatas[_curPageIndex];
   }
 
   @override
@@ -137,45 +171,71 @@ class _StoryPageContainerBuilderState extends State<StoryPageContainerBuilder> {
           final animationValue = Interval(
             0.0,
             1.0,
-            curve: widget.curve ?? Curves.linear,
+            curve: widget.settings.curve ?? Curves.linear,
           ).transform(
             1.0 - widget.animation.value,
           );
-          final itemCount = widget.allButtonDatas.length;
+
+          double bgOpacity = 1.0 -
+              Interval(
+                0.0,
+                kMaxPageOverscroll,
+              ).transform(
+                _bgOpacityControlValue,
+              );
+          final itemCount = widget.settings.allButtonDatas.length;
+          if (_isClosed) {
+            bgOpacity = 0.0;
+          }
+
           return ClipRRect(
             clipper: _PageClipper(
-              borderRadius: widget.buttonData.borderDecoration.borderRadius
+              borderRadius: widget.settings.buttonData.borderDecoration.borderRadius
                   ?.resolve(
                     null,
                   )
                   .bottomLeft,
-              startX: widget.tapPosition.dx,
-              startY: widget.tapPosition.dy,
+              startX: _activeButtonData.buttonCenterPosition?.dx ??
+                  widget.settings.tapPosition.dx,
+              startY: _activeButtonData.buttonCenterPosition?.dy ??
+                  widget.settings.tapPosition.dy,
               animationValue: animationValue,
             ),
             child: Scaffold(
-              backgroundColor: widget.buttonData.storyPageDecoration.color,
+              backgroundColor: Colors.transparent,
               body: Container(
-                decoration: widget.buttonData.containerBackgroundDecoration,
-                child: PageView.builder(
-                  physics: BouncingScrollPhysics(),
-                  controller: _pageController,
-                  itemBuilder: ((context, index) {
-                    final childIndex = index % itemCount;
-                    final buttonData = widget.allButtonDatas[childIndex];
-                    final child = StoryPageContainerView(
-                      buttonData: buttonData,
-                      onStoryComplete: _onStoryComplete,
-                    );
-                    return _storyPageTransform.transform(
-                      context,
-                      child,
-                      childIndex,
-                      _currentPage,
-                      _pageDelta,
-                    );
-                  }),
-                  itemCount: itemCount,
+                decoration:
+                    widget.settings.buttonData.containerBackgroundDecoration.copyWith(
+                  color: widget.settings.buttonData.containerBackgroundDecoration.color
+                      ?.withOpacity(
+                    bgOpacity,
+                  ),
+                ),
+                child: SafeArea(
+                  bottom: widget.settings.safeAreaBottom,
+                  top: widget.settings.safeAreaTop,
+                  child: PageView.builder(
+                    physics: _storyPageTransform.pageScrollPhysics,
+                    controller: _pageController,
+                    itemBuilder: ((context, index) {
+                      final childIndex = index % itemCount;
+                      final buttonData = widget.settings.allButtonDatas[childIndex];
+                      final child = StoryPageContainerView(
+                        buttonData: buttonData,
+                        onClosePressed: _close,
+                        pageController: _pageController,
+                        onStoryComplete: _onStoryComplete,
+                      );
+                      return _storyPageTransform.transform(
+                        context,
+                        child,
+                        childIndex,
+                        _currentPage,
+                        _pageDelta,
+                      );
+                    }),
+                    itemCount: itemCount,
+                  ),
                 ),
               ),
             ),
