@@ -12,6 +12,8 @@ Missing yet:
 - Button preloaders that allow the stories to be requested from the backend before opening 
 - Lazy loaders that preload visible the stories from the backend in the background
   
+<img src="https://github.com/caseyryan/images/blob/master/insta_story/insta_story.gif?raw=true" width="240"/>
+
 
 ## Getting started
 The easiest way to get started is to use a built-in StoryListView to create story buttons
