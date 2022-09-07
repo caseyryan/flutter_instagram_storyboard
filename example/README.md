@@ -1,6 +1,6 @@
 # example
 
-A new Flutter project.
+An example of creating a storyboard
 
 ## Getting Started
 
