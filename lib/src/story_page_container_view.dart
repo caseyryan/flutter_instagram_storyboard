@@ -27,14 +27,15 @@ class StoryPageContainerView extends StatefulWidget {
 class _StoryPageContainerViewState extends State<StoryPageContainerView>
     with FirstBuildMixin {
   late StoryTimelineController _storyController;
-  Stopwatch _stopwatch = Stopwatch();
+  final Stopwatch _stopwatch = Stopwatch();
   Offset _pointerDownPosition = Offset.zero;
   int _pointerDownMillis = 0;
   double _pageValue = 0.0;
 
   @override
   void initState() {
-    _storyController = widget.buttonData.storyController ?? StoryTimelineController();
+    _storyController =
+        widget.buttonData.storyController ?? StoryTimelineController();
     _stopwatch.start();
     _storyController.addListener(_onTimelineEvent);
     super.initState();
@@ -58,7 +59,7 @@ class _StoryPageContainerViewState extends State<StoryPageContainerView>
   }
 
   void _onTimelineEvent(StoryTimelineEvent event) {
-    if (event == StoryTimelineEvent.StoryComplete) {
+    if (event == StoryTimelineEvent.storyComplete) {
       widget.onStoryComplete.call();
     }
     setState(() {});
@@ -82,9 +83,11 @@ class _StoryPageContainerViewState extends State<StoryPageContainerView>
             }
           },
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(40.0),
+            borderRadius: BorderRadius.circular(
+              40.0,
+            ),
           ),
-          child: Container(
+          child: SizedBox(
             height: 40.0,
             width: 40.0,
             child: Icon(
@@ -103,7 +106,7 @@ class _StoryPageContainerViewState extends State<StoryPageContainerView>
       ),
       child: Row(
         children: [
-          Expanded(child: SizedBox()),
+          const Expanded(child: SizedBox()),
           closeButton,
         ],
       ),
@@ -133,7 +136,7 @@ class _StoryPageContainerViewState extends State<StoryPageContainerView>
     if (widget.buttonData.storyPages.isEmpty) {
       return Container(
         color: Colors.orange,
-        child: Center(
+        child: const Center(
           child: Text('No pages'),
         ),
       );
@@ -174,7 +177,7 @@ class _StoryPageContainerViewState extends State<StoryPageContainerView>
         }
         _storyController.unpause();
       },
-      child: Container(
+      child: SizedBox(
         width: double.infinity,
         height: double.infinity,
         child: Stack(
@@ -212,8 +215,8 @@ class _StoryPageContainerViewState extends State<StoryPageContainerView>
 }
 
 enum StoryTimelineEvent {
-  StoryComplete,
-  SegmentComplete,
+  storyComplete,
+  segmentComplete,
 }
 
 typedef StoryTimelineCallback = Function(StoryTimelineEvent);
@@ -221,10 +224,8 @@ typedef StoryTimelineCallback = Function(StoryTimelineEvent);
 class StoryTimelineController {
   _StoryTimelineState? _state;
 
-  int _curSegmentIndex = 0;
-  int get curSegmentIndex => _curSegmentIndex;
-
-  HashSet<StoryTimelineCallback> _listeners = HashSet<StoryTimelineCallback>();
+  final HashSet<StoryTimelineCallback> _listeners =
+      HashSet<StoryTimelineCallback>();
 
   void addListener(StoryTimelineCallback callback) {
     _listeners.add(callback);
@@ -235,17 +236,17 @@ class StoryTimelineController {
   }
 
   void _onStoryComplete() {
-    _notifyListeners(StoryTimelineEvent.StoryComplete);
+    _notifyListeners(StoryTimelineEvent.storyComplete);
   }
 
   void _onSegmentComplete() {
-    _notifyListeners(StoryTimelineEvent.SegmentComplete);
+    _notifyListeners(StoryTimelineEvent.segmentComplete);
   }
 
   void _notifyListeners(StoryTimelineEvent event) {
-    _listeners.forEach((e) {
+    for (var e in _listeners) {
       e.call(event);
-    });
+    }
   }
 
   void nextSegment() {

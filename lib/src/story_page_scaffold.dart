@@ -52,8 +52,8 @@ class StoryPageScaffold extends StatelessWidget {
 }
 
 enum GradientTransitionDirection {
-  Vertical,
-  Horizontal,
+  vertical,
+  horizontal,
 }
 
 class GradientTransition extends StatelessWidget {
@@ -71,18 +71,18 @@ class GradientTransition extends StatelessWidget {
     this.bottomPositioned = false,
     required this.baseColor,
     this.isReversed = false,
-    this.gradientTransitionDirection = GradientTransitionDirection.Vertical,
+    this.gradientTransitionDirection = GradientTransitionDirection.vertical,
   }) : super(key: key);
 
   AlignmentGeometry get _begin {
-    if (gradientTransitionDirection == GradientTransitionDirection.Vertical) {
+    if (gradientTransitionDirection == GradientTransitionDirection.vertical) {
       return Alignment.topCenter;
     }
     return Alignment.centerLeft;
   }
 
   AlignmentGeometry get _end {
-    if (gradientTransitionDirection == GradientTransitionDirection.Vertical) {
+    if (gradientTransitionDirection == GradientTransitionDirection.vertical) {
       return Alignment.bottomCenter;
     }
     return Alignment.centerRight;
@@ -118,10 +118,10 @@ class GradientTransition extends StatelessWidget {
     );
     if (bottomPositioned) {
       return Positioned(
-        child: container,
         left: 0.0,
         right: 0.0,
         bottom: 0.0,
+        child: container,
       );
     }
     return container;

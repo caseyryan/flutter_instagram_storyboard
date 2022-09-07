@@ -16,19 +16,21 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.red,
       ),
-      home: const StoryExample(),
+      home: const StoryExamplePage(),
     );
   }
 }
 
-class StoryExample extends StatefulWidget {
-  const StoryExample({Key? key}) : super(key: key);
+class StoryExamplePage extends StatefulWidget {
+  const StoryExamplePage({
+    Key? key,
+  }) : super(key: key);
 
   @override
-  State<StoryExample> createState() => _StoryExampleState();
+  State<StoryExamplePage> createState() => _StoryExamplePageState();
 }
 
-class _StoryExampleState extends State<StoryExample> {
+class _StoryExamplePageState extends State<StoryExamplePage> {
   Widget _createDummyPage({
     required String text,
     required String imageName,
@@ -36,7 +38,7 @@ class _StoryExampleState extends State<StoryExample> {
   }) {
     return StoryPageScaffold(
       bottomNavigationBar: addBottomBar
-          ? Container(
+          ? SizedBox(
               width: double.infinity,
               height: kBottomNavigationBarHeight,
               child: Padding(
@@ -61,8 +63,8 @@ class _StoryExampleState extends State<StoryExample> {
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
                       child: Icon(
                         Icons.send,
                         color: Colors.white,
@@ -72,7 +74,7 @@ class _StoryExampleState extends State<StoryExample> {
                 ),
               ),
             )
-          : SizedBox.shrink(),
+          : const SizedBox.shrink(),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -92,7 +94,7 @@ class _StoryExampleState extends State<StoryExample> {
             children: [
               Text(
                 text,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 30.0,
                   fontWeight: FontWeight.bold,
@@ -114,7 +116,7 @@ class _StoryExampleState extends State<StoryExample> {
         children: [
           Text(
             text,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
             ),
@@ -161,8 +163,7 @@ class _StoryExampleState extends State<StoryExample> {
       body: Column(
         children: [
           StoryListView(
-            // pageTransform: StoryNoTransform(),
-            pageTransform: StoryPage3DTransform(),
+            pageTransform: const StoryPage3DTransform(),
             buttonDatas: [
               StoryButtonData(
                 timelineBackgroundColor: Colors.red,
@@ -181,13 +182,13 @@ class _StoryExampleState extends State<StoryExample> {
                     imageName: 'car',
                   ),
                 ],
-                segmentDuration: Duration(seconds: 3),
+                segmentDuration: const Duration(seconds: 3),
               ),
               StoryButtonData(
                 timelineBackgroundColor: Colors.blue,
                 buttonDecoration: _buildButtonDecoration('travel_1'),
-                borderDecoration:
-                    _buildBorderDecoration(Color.fromARGB(255, 134, 119, 95)),
+                borderDecoration: _buildBorderDecoration(
+                    const Color.fromARGB(255, 134, 119, 95)),
                 child: _buildButtonText('Travel whereever'),
                 storyPages: [
                   _createDummyPage(
@@ -206,7 +207,7 @@ class _StoryExampleState extends State<StoryExample> {
                     addBottomBar: false,
                   ),
                 ],
-                segmentDuration: Duration(seconds: 3),
+                segmentDuration: const Duration(seconds: 3),
               ),
               StoryButtonData(
                 timelineBackgroundColor: Colors.orange,
@@ -219,7 +220,7 @@ class _StoryExampleState extends State<StoryExample> {
                     imageName: 'house',
                   ),
                 ],
-                segmentDuration: Duration(seconds: 5),
+                segmentDuration: const Duration(seconds: 5),
               ),
               StoryButtonData(
                 timelineBackgroundColor: Colors.red,
@@ -238,12 +239,12 @@ class _StoryExampleState extends State<StoryExample> {
                     imageName: 'car',
                   ),
                 ],
-                segmentDuration: Duration(seconds: 3),
+                segmentDuration: const Duration(seconds: 3),
               ),
               StoryButtonData(
                 buttonDecoration: _buildButtonDecoration('travel_1'),
-                borderDecoration:
-                    _buildBorderDecoration(Color.fromARGB(255, 134, 119, 95)),
+                borderDecoration: _buildBorderDecoration(
+                    const Color.fromARGB(255, 134, 119, 95)),
                 child: _buildButtonText('Travel whereever'),
                 storyPages: [
                   _createDummyPage(
@@ -262,7 +263,7 @@ class _StoryExampleState extends State<StoryExample> {
                     addBottomBar: false,
                   ),
                 ],
-                segmentDuration: Duration(seconds: 3),
+                segmentDuration: const Duration(seconds: 3),
               ),
               StoryButtonData(
                 timelineBackgroundColor: Colors.orange,
@@ -275,7 +276,7 @@ class _StoryExampleState extends State<StoryExample> {
                     imageName: 'house',
                   ),
                 ],
-                segmentDuration: Duration(seconds: 5),
+                segmentDuration: const Duration(seconds: 5),
               ),
             ],
           ),

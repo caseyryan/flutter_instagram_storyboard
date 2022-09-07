@@ -35,7 +35,7 @@ class StoryListView extends StatefulWidget {
 }
 
 class _StoryListViewState extends State<StoryListView> {
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {

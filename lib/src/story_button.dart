@@ -76,13 +76,13 @@ class StoryButtonData {
       color: Color.fromARGB(255, 0, 0, 0),
     ),
     this.buttonDecoration = const BoxDecoration(
-      borderRadius: const BorderRadius.all(
+      borderRadius: BorderRadius.all(
         Radius.circular(12.0),
       ),
       color: Color.fromARGB(255, 226, 226, 226),
     ),
     this.borderDecoration = const BoxDecoration(
-      borderRadius: const BorderRadius.all(
+      borderRadius: BorderRadius.all(
         Radius.circular(15.0),
       ),
       border: Border.fromBorderSide(
@@ -96,8 +96,7 @@ class StoryButtonData {
   }) : assert(
           segmentDuration.inMilliseconds % kStoryTimerTickMillis == 0 &&
               segmentDuration.inMilliseconds >= 1000,
-          'Segment duration in milliseconds must be a ' +
-              'multiple of $kStoryTimerTickMillis and not less than 1000 milliseconds',
+          'Segment duration in milliseconds must be a multiple of $kStoryTimerTickMillis and not less than 1000 milliseconds',
         );
 }
 
@@ -209,19 +208,21 @@ class _StoryButtonState extends State<StoryButton>
     return AspectRatio(
       aspectRatio: widget.buttonData.aspectRatio,
       child: Container(
-        decoration:
-            widget.buttonData._isWatched ? null : widget.buttonData.borderDecoration,
+        decoration: widget.buttonData._isWatched
+            ? null
+            : widget.buttonData.borderDecoration,
         child: Padding(
           padding: EdgeInsets.all(
             widget.buttonData.borderOffset,
           ),
           child: ClipRRect(
-            borderRadius: widget.buttonData.buttonDecoration.borderRadius?.resolve(
-                  null,
-                ) ??
-                BorderRadius.all(
-                  Radius.circular(12.0),
-                ),
+            borderRadius:
+                widget.buttonData.buttonDecoration.borderRadius?.resolve(
+                      null,
+                    ) ??
+                    const BorderRadius.all(
+                      Radius.circular(12.0),
+                    ),
             child: Stack(
               children: [
                 Container(
@@ -231,16 +232,16 @@ class _StoryButtonState extends State<StoryButton>
                 ),
                 _buildChild(),
                 Material(
+                  color: Colors.transparent,
                   child: InkWell(
-                    splashFactory:
-                        widget.buttonData.inkFeatureFactory ?? InkRipple.splashFactory,
+                    splashFactory: widget.buttonData.inkFeatureFactory ??
+                        InkRipple.splashFactory,
                     onTap: _onTap,
-                    child: Container(
+                    child: const SizedBox(
                       width: double.infinity,
                       height: double.infinity,
                     ),
                   ),
-                  color: Colors.transparent,
                 ),
               ],
             ),

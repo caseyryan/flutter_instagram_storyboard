@@ -35,10 +35,9 @@ class StoryPageNoTransform implements IStoryPageTransform {
   ) {
     return child;
   }
-  
+
   @override
   ScrollPhysics? get pageScrollPhysics => null;
-
 }
 
 class StoryPage3DTransform implements IStoryPageTransform {
@@ -48,10 +47,10 @@ class StoryPage3DTransform implements IStoryPageTransform {
   const StoryPage3DTransform({
     this.perspective = 0.0008,
     double degAngle = 90.0,
-  }) : this.radAngle = pi / 180.0 * degAngle;
+  }) : radAngle = pi / 180.0 * degAngle;
 
   @override
-  ScrollPhysics? get pageScrollPhysics => BouncingScrollPhysics();
+  ScrollPhysics? get pageScrollPhysics => const BouncingScrollPhysics();
 
   @override
   Widget transform(

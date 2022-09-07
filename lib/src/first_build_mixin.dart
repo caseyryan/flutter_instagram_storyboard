@@ -20,13 +20,4 @@ mixin FirstBuildMixin<T extends StatefulWidget> on State<T> {
   }
 
   void didFirstBuildFinish(BuildContext context);
-
-  void callAfterFrame(ValueChanged<BuildContext> fn) {
-    _widgetsBinding?.ensureVisualUpdate();
-    _widgetsBinding?.addPostFrameCallback((timeStamp) {
-      if (mounted) {
-        fn.call(context);
-      }
-    });
-  }
 }
