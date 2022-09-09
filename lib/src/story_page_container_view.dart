@@ -297,7 +297,6 @@ class _StoryTimelineState extends State<StoryTimeline> {
 
   @override
   void initState() {
-    widget.buttonData.martAsWatched();
     _maxAccumulator = widget.buttonData.segmentDuration.inMilliseconds;
     _timer = Timer.periodic(
       const Duration(
@@ -307,6 +306,10 @@ class _StoryTimelineState extends State<StoryTimeline> {
     );
     widget.controller._state = this;
     super.initState();
+    if (widget.buttonData.storyWatchedContract ==
+        StoryWatchedContract.onStoryStart) {
+      widget.buttonData.markAsWatched();
+    }
   }
 
   void _setTimelineAvailable(bool value) {
@@ -333,10 +336,18 @@ class _StoryTimelineState extends State<StoryTimeline> {
   }
 
   void _onStoryComplete() {
+    if (widget.buttonData.storyWatchedContract ==
+        StoryWatchedContract.onStoryEnd) {
+      widget.buttonData.markAsWatched();
+    }
     widget.controller._onStoryComplete();
   }
 
   void _onSegmentComplete() {
+    if (widget.buttonData.storyWatchedContract ==
+        StoryWatchedContract.onSegmentEnd) {
+      widget.buttonData.markAsWatched();
+    }
     widget.controller._onSegmentComplete();
   }
 

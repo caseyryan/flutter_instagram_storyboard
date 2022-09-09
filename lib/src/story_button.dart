@@ -108,7 +108,7 @@ class _StoryButtonState extends State<StoryButton>
 
   void _onTap() {
     setState(() {
-      widget.buttonData.martAsWatched();
+      widget.buttonData.markAsWatched();
     });
     widget.onPressed.call(widget.buttonData);
   }
@@ -173,13 +173,18 @@ class _StoryButtonState extends State<StoryButton>
 
 const int kStoryTimerTickMillis = 50;
 
-/// [segmentDuration] Duration of each segment in this story
+enum StoryWatchedContract {
+  onStoryStart,
+  onStoryEnd,
+  onSegmentEnd,
+}
+
 class StoryButtonData {
   /// This affects a border around button
   /// after the story was watched
   /// the border will disappear
   bool _isWatched = false;
-  void martAsWatched() {
+  void markAsWatched() {
     _isWatched = true;
     _iWatchMarkable?.markAsWatched();
   }
@@ -190,7 +195,7 @@ class StoryButtonData {
   IWatchMarkable? _iWatchMarkable;
 
   final StoryTimelineController? storyController;
-
+  final StoryWatchedContract storyWatchedContract;
   final Curve? pageAnimationCurve;
   final Duration? pageAnimationDuration;
   final double aspectRatio;
@@ -224,7 +229,16 @@ class StoryButtonData {
     return _buttonPositionable?.rightPosition;
   }
 
+  /// [storyWatchedContract] When you want the story to be marked as
+  /// watch [StoryWatchedContract.onStoryEnd] means it will be marked only
+  /// when you watched the last segment of the story
+  /// [StoryWatchedContract.onSegmentEnd] the story will be marked as
+  /// read after you have watched at least one segment
+  /// [StoryWatchedContract.onStoryStart] the story will be marked as read
+  /// right when you open it
+  /// [segmentDuration] Duration of each segment in this story
   StoryButtonData({
+    this.storyWatchedContract = StoryWatchedContract.onStoryEnd,
     this.storyController,
     this.aspectRatio = 1.0,
     this.timelineThikness = 2.0,
