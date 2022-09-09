@@ -31,6 +31,8 @@ class StoryExamplePage extends StatefulWidget {
 }
 
 class _StoryExamplePageState extends State<StoryExamplePage> {
+  static const double _borderRadius = 100.0;
+
   Widget _createDummyPage({
     required String text,
     required String imageName,
@@ -58,7 +60,7 @@ class _StoryExamplePageState extends State<StoryExamplePage> {
                             width: 2.0,
                           ),
                           borderRadius: BorderRadius.circular(
-                            50.0,
+                            _borderRadius,
                           ),
                         ),
                       ),
@@ -107,19 +109,24 @@ class _StoryExamplePageState extends State<StoryExamplePage> {
     );
   }
 
-  Widget _buildButtonText(String text) {
+  Widget _buildButtonChild(String text) {
     return Padding(
       padding: const EdgeInsets.all(5.0),
       child: Column(
         mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
+          const SizedBox(
+            height: 100.0,
+          ),
           Text(
             text,
             style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+              color: Colors.black,
+              fontWeight: FontWeight.normal,
+              fontSize: 11.0,
             ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -130,6 +137,7 @@ class _StoryExamplePageState extends State<StoryExamplePage> {
     String imageName,
   ) {
     return BoxDecoration(
+      borderRadius: BorderRadius.circular(_borderRadius),
       image: DecorationImage(
         image: AssetImage(
           'assets/images/$imageName.png',
@@ -142,7 +150,7 @@ class _StoryExamplePageState extends State<StoryExamplePage> {
   BoxDecoration _buildBorderDecoration(Color color) {
     return BoxDecoration(
       borderRadius: const BorderRadius.all(
-        Radius.circular(15.0),
+        Radius.circular(_borderRadius),
       ),
       border: Border.fromBorderSide(
         BorderSide(
@@ -163,12 +171,13 @@ class _StoryExamplePageState extends State<StoryExamplePage> {
       body: Column(
         children: [
           StoryListView(
+            listHeight: 180.0,
             pageTransform: const StoryPage3DTransform(),
             buttonDatas: [
               StoryButtonData(
                 timelineBackgroundColor: Colors.red,
                 buttonDecoration: _buildButtonDecoration('car'),
-                child: _buildButtonText('Want a new car?'),
+                child: _buildButtonChild('Want a new car?'),
                 borderDecoration: _buildBorderDecoration(Colors.red),
                 storyPages: [
                   _createDummyPage(
@@ -189,7 +198,7 @@ class _StoryExamplePageState extends State<StoryExamplePage> {
                 buttonDecoration: _buildButtonDecoration('travel_1'),
                 borderDecoration: _buildBorderDecoration(
                     const Color.fromARGB(255, 134, 119, 95)),
-                child: _buildButtonText('Travel whereever'),
+                child: _buildButtonChild('Travel whereever'),
                 storyPages: [
                   _createDummyPage(
                     text: 'Get a loan',
@@ -213,7 +222,7 @@ class _StoryExamplePageState extends State<StoryExamplePage> {
                 timelineBackgroundColor: Colors.orange,
                 borderDecoration: _buildBorderDecoration(Colors.orange),
                 buttonDecoration: _buildButtonDecoration('house'),
-                child: _buildButtonText('Buy a house anywhere'),
+                child: _buildButtonChild('Buy a house anywhere'),
                 storyPages: [
                   _createDummyPage(
                     text: 'You cannot buy a house. Live with it',
@@ -225,7 +234,7 @@ class _StoryExamplePageState extends State<StoryExamplePage> {
               StoryButtonData(
                 timelineBackgroundColor: Colors.red,
                 buttonDecoration: _buildButtonDecoration('car'),
-                child: _buildButtonText('Want a new car?'),
+                child: _buildButtonChild('Want a new car?'),
                 borderDecoration: _buildBorderDecoration(Colors.red),
                 storyPages: [
                   _createDummyPage(
@@ -245,7 +254,7 @@ class _StoryExamplePageState extends State<StoryExamplePage> {
                 buttonDecoration: _buildButtonDecoration('travel_1'),
                 borderDecoration: _buildBorderDecoration(
                     const Color.fromARGB(255, 134, 119, 95)),
-                child: _buildButtonText('Travel whereever'),
+                child: _buildButtonChild('Travel whereever'),
                 storyPages: [
                   _createDummyPage(
                     text: 'Get a loan',
@@ -269,7 +278,7 @@ class _StoryExamplePageState extends State<StoryExamplePage> {
                 timelineBackgroundColor: Colors.orange,
                 borderDecoration: _buildBorderDecoration(Colors.orange),
                 buttonDecoration: _buildButtonDecoration('house'),
-                child: _buildButtonText('Buy a house anywhere'),
+                child: _buildButtonChild('Buy a house anywhere'),
                 storyPages: [
                   _createDummyPage(
                     text: 'You cannot buy a house. Live with it',

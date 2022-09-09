@@ -15,17 +15,21 @@ class StoryListView extends StatefulWidget {
   final IStoryPageTransform? pageTransform;
   final bool safeAreaTop;
   final bool safeAreaBottom;
+  final double listHeight;
+  final double buttonWidth;
 
   const StoryListView({
     Key? key,
     required this.buttonDatas,
     this.buttonSpacing = 10.0,
     this.paddingLeft = 10.0,
+    this.listHeight = 120.0,
     this.paddingRight = 10.0,
     this.paddingTop = 10.0,
     this.paddingBottom = 10.0,
     this.physics,
     this.pageTransform,
+    this.buttonWidth = 100.0,
     this.safeAreaTop = true,
     this.safeAreaBottom = true,
   }) : super(key: key);
@@ -67,7 +71,7 @@ class _StoryListViewState extends State<StoryListView> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 120.0,
+      height: widget.listHeight,
       child: Padding(
         padding: EdgeInsets.only(
           top: widget.paddingTop,
@@ -86,12 +90,15 @@ class _StoryListViewState extends State<StoryListView> {
                 left: isFirst ? widget.paddingLeft : 0.0,
                 right: isLast ? widget.paddingRight : widget.buttonSpacing,
               ),
-              child: StoryButton(
-                buttonData: buttonData,
-                allButtonDatas: widget.buttonDatas,
-                pageTransform: widget.pageTransform,
-                storyListViewController: _scrollController,
-                onPressed: _onButtonPressed,
+              child: SizedBox(
+                width: widget.buttonWidth,
+                child: StoryButton(
+                  buttonData: buttonData,
+                  allButtonDatas: widget.buttonDatas,
+                  pageTransform: widget.pageTransform,
+                  storyListViewController: _scrollController,
+                  onPressed: _onButtonPressed,
+                ),
               ),
             );
           },

@@ -2,10 +2,178 @@ import 'package:flutter/material.dart';
 import 'package:flutter_instagram_storyboard/src/set_state_after_frame_mixin.dart';
 import 'package:flutter_instagram_storyboard/src/story_page_transform.dart';
 
+import 'first_build_mixin.dart';
 import 'story_page_container_view.dart';
+
+class StoryButton extends StatefulWidget {
+  final StoryButtonData buttonData;
+  final ValueChanged<StoryButtonData> onPressed;
+
+  /// [allButtonDatas] required to be able to page through
+  /// all stories
+  final List<StoryButtonData> allButtonDatas;
+  final IStoryPageTransform? pageTransform;
+  final ScrollController storyListViewController;
+
+  const StoryButton({
+    Key? key,
+    required this.onPressed,
+    required this.buttonData,
+    required this.allButtonDatas,
+    required this.storyListViewController,
+    this.pageTransform,
+  }) : super(key: key);
+
+  @override
+  State<StoryButton> createState() => _StoryButtonState();
+}
+
+class _StoryButtonState extends State<StoryButton>
+    with SetStateAfterFrame, FirstBuildMixin
+    implements IButtonPositionable, IWatchMarkable {
+  double? _buttonWidth;
+
+  @override
+  void initState() {
+    _updateDependencies();
+    super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant StoryButton oldWidget) {
+    _updateDependencies();
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void didFirstBuildFinish(BuildContext context) {
+    setState(() {
+      _buttonWidth = context.size?.width;
+    });
+  }
+
+  void _updateDependencies() {
+    widget.buttonData._buttonPositionable = this;
+    widget.buttonData._iWatchMarkable = this;
+  }
+
+  Widget _buildChild() {
+    if (_buttonWidth == null) {
+      return const SizedBox.shrink();
+    }
+    return SizedBox(
+      width: _buttonWidth,
+      child: widget.buttonData.child,
+    );
+  }
+
+  @override
+  Offset? get centerPosition {
+    if (!mounted) {
+      return null;
+    }
+    final renderBox = context.findRenderObject() as RenderBox;
+    return renderBox.localToGlobal(
+      Offset(
+        renderBox.paintBounds.width * .5,
+        renderBox.paintBounds.height * .5,
+      ),
+    );
+  }
+
+  @override
+  Offset? get rightPosition {
+    if (!mounted) {
+      return null;
+    }
+    final renderBox = context.findRenderObject() as RenderBox;
+    return renderBox.localToGlobal(
+      Offset(
+        renderBox.paintBounds.width,
+        0.0,
+      ),
+    );
+  }
+
+  @override
+  Offset? get leftPosition {
+    if (!mounted) {
+      return null;
+    }
+    final renderBox = context.findRenderObject() as RenderBox;
+    return renderBox.localToGlobal(
+      Offset.zero,
+    );
+  }
+
+  void _onTap() {
+    setState(() {
+      widget.buttonData.martAsWatched();
+    });
+    widget.onPressed.call(widget.buttonData);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        AspectRatio(
+          aspectRatio: widget.buttonData.aspectRatio,
+          child: Container(
+            decoration: widget.buttonData._isWatched
+                ? null
+                : widget.buttonData.borderDecoration,
+            child: Padding(
+              padding: EdgeInsets.all(
+                widget.buttonData.borderOffset,
+              ),
+              child: ClipRRect(
+                borderRadius:
+                    widget.buttonData.buttonDecoration.borderRadius?.resolve(
+                          null,
+                        ) ??
+                        const BorderRadius.all(
+                          Radius.circular(12.0),
+                        ),
+                child: Stack(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      height: double.infinity,
+                      decoration: widget.buttonData.buttonDecoration,
+                    ),
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        splashFactory: widget.buttonData.inkFeatureFactory ??
+                            InkRipple.splashFactory,
+                        onTap: _onTap,
+                        child: const SizedBox(
+                          width: double.infinity,
+                          height: double.infinity,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        _buildChild(),
+      ],
+    );
+  }
+
+  @override
+  void markAsWatched() {
+    safeSetState(() {});
+  }
+}
 
 const int kStoryTimerTickMillis = 50;
 
+/// [segmentDuration] Duration of each segment in this story
 class StoryButtonData {
   /// This affects a border around button
   /// after the story was watched
@@ -108,151 +276,4 @@ abstract class IButtonPositionable {
   Offset? get centerPosition;
   Offset? get leftPosition;
   Offset? get rightPosition;
-}
-
-class StoryButton extends StatefulWidget {
-  final StoryButtonData buttonData;
-  final ValueChanged<StoryButtonData> onPressed;
-
-  /// [allButtonDatas] required to be able to page through
-  /// all stories
-  final List<StoryButtonData> allButtonDatas;
-  final IStoryPageTransform? pageTransform;
-  final ScrollController storyListViewController;
-
-  const StoryButton({
-    Key? key,
-    required this.onPressed,
-    required this.buttonData,
-    required this.allButtonDatas,
-    required this.storyListViewController,
-    this.pageTransform,
-  }) : super(key: key);
-
-  @override
-  State<StoryButton> createState() => _StoryButtonState();
-}
-
-class _StoryButtonState extends State<StoryButton>
-    with SetStateAfterFrame
-    implements IButtonPositionable, IWatchMarkable {
-  @override
-  void initState() {
-    _updateDependencies();
-    super.initState();
-  }
-
-  @override
-  void didUpdateWidget(covariant StoryButton oldWidget) {
-    _updateDependencies();
-    super.didUpdateWidget(oldWidget);
-  }
-
-  void _updateDependencies() {
-    widget.buttonData._buttonPositionable = this;
-    widget.buttonData._iWatchMarkable = this;
-  }
-
-  Widget _buildChild() {
-    return widget.buttonData.child;
-  }
-
-  @override
-  Offset? get centerPosition {
-    if (!mounted) {
-      return null;
-    }
-    final renderBox = context.findRenderObject() as RenderBox;
-    return renderBox.localToGlobal(
-      Offset(
-        renderBox.paintBounds.width * .5,
-        renderBox.paintBounds.height * .5,
-      ),
-    );
-  }
-
-  @override
-  Offset? get rightPosition {
-    if (!mounted) {
-      return null;
-    }
-    final renderBox = context.findRenderObject() as RenderBox;
-    return renderBox.localToGlobal(
-      Offset(
-        renderBox.paintBounds.width,
-        0.0,
-      ),
-    );
-  }
-
-  @override
-  Offset? get leftPosition {
-    if (!mounted) {
-      return null;
-    }
-    final renderBox = context.findRenderObject() as RenderBox;
-    return renderBox.localToGlobal(
-      Offset.zero,
-    );
-  }
-
-  void _onTap() {
-    setState(() {
-      widget.buttonData.martAsWatched();
-    });
-    widget.onPressed.call(widget.buttonData);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: widget.buttonData.aspectRatio,
-      child: Container(
-        decoration: widget.buttonData._isWatched
-            ? null
-            : widget.buttonData.borderDecoration,
-        child: Padding(
-          padding: EdgeInsets.all(
-            widget.buttonData.borderOffset,
-          ),
-          child: ClipRRect(
-            borderRadius:
-                widget.buttonData.buttonDecoration.borderRadius?.resolve(
-                      null,
-                    ) ??
-                    const BorderRadius.all(
-                      Radius.circular(12.0),
-                    ),
-            child: Stack(
-              children: [
-                Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  decoration: widget.buttonData.buttonDecoration,
-                ),
-                _buildChild(),
-                Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    splashFactory: widget.buttonData.inkFeatureFactory ??
-                        InkRipple.splashFactory,
-                    onTap: _onTap,
-                    child: const SizedBox(
-                      width: double.infinity,
-                      height: double.infinity,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  @override
-  void markAsWatched() {
-    safeSetState(() {});
-  }
 }
