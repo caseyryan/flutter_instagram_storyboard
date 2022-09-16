@@ -202,6 +202,7 @@ class _StoryPageContainerViewState extends State<StoryPageContainerView>
   void dispose() {
     widget.pageController?.removeListener(_onPageControllerUpdate);
     _stopwatch.stop();
+    _storyController.removeListener(_onTimelineEvent);
     super.dispose();
   }
 

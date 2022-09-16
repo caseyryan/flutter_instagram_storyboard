@@ -1,6 +1,6 @@
 name: flutter_instagram_storyboard
 description: A package that allows you to create stories like in instagram
-version: 0.0.4
+version: 0.0.5
 homepage: https://github.com/caseyryan/flutter_instagram_storyboard
 
 environment:
