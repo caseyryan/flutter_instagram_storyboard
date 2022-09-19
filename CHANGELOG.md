@@ -1,3 +1,6 @@
+## 0.0.7
+- Button list is disabled if buttonDatas is empty. In this case 
+- it will resurn SizedBox.shrink()
 ## 0.0.6
 - Buttons can be conditionally enabled or disabled now by calling
 their "isVisible" callback

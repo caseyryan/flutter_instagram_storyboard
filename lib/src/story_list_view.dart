@@ -73,6 +73,9 @@ class _StoryListViewState extends State<StoryListView> {
     final buttonDatas = widget.buttonDatas.where((b) {
       return b.isVisibleCallback();
     }).toList();
+    if (buttonDatas.isEmpty) {
+      return const SizedBox.shrink();
+    }
     return SizedBox(
       height: widget.listHeight,
       child: Padding(
