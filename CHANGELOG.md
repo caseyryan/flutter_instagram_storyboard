@@ -1,3 +1,6 @@
+## 0.0.6
+- Buttons can be conditionally enabled or disabled now by calling
+their "isVisible" callback
 ## 0.0.5
 - Added removeListener call to the story timeline controller
 ## 0.0.4

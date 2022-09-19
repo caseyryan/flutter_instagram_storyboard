@@ -70,6 +70,9 @@ class _StoryListViewState extends State<StoryListView> {
 
   @override
   Widget build(BuildContext context) {
+    final buttonDatas = widget.buttonDatas.where((b) {
+      return b.isVisibleCallback();
+    }).toList();
     return SizedBox(
       height: widget.listHeight,
       child: Padding(
@@ -82,9 +85,9 @@ class _StoryListViewState extends State<StoryListView> {
           physics: widget.physics,
           scrollDirection: Axis.horizontal,
           itemBuilder: (c, int index) {
-            final isLast = index == widget.buttonDatas.length - 1;
+            final isLast = index == buttonDatas.length - 1;
             final isFirst = index == 0;
-            final buttonData = widget.buttonDatas[index];
+            final buttonData = buttonDatas[index];
             return Padding(
               padding: EdgeInsets.only(
                 left: isFirst ? widget.paddingLeft : 0.0,
@@ -94,7 +97,7 @@ class _StoryListViewState extends State<StoryListView> {
                 width: widget.buttonWidth,
                 child: StoryButton(
                   buttonData: buttonData,
-                  allButtonDatas: widget.buttonDatas,
+                  allButtonDatas: buttonDatas,
                   pageTransform: widget.pageTransform,
                   storyListViewController: _scrollController,
                   onPressed: _onButtonPressed,
@@ -102,7 +105,7 @@ class _StoryListViewState extends State<StoryListView> {
               ),
             );
           },
-          itemCount: widget.buttonDatas.length,
+          itemCount: buttonDatas.length,
         ),
       ),
     );

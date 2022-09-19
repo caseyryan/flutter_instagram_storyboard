@@ -275,6 +275,9 @@ class _StoryExamplePageState extends State<StoryExamplePage> {
                 segmentDuration: const Duration(seconds: 3),
               ),
               StoryButtonData(
+                isVisibleCallback: () {
+                  return false;
+                },
                 timelineBackgroundColor: Colors.orange,
                 borderDecoration: _buildBorderDecoration(Colors.orange),
                 buttonDecoration: _buildButtonDecoration('house'),

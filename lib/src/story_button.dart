@@ -179,7 +179,13 @@ enum StoryWatchedContract {
   onSegmentEnd,
 }
 
+typedef IsVisibleCallback = bool Function();
+
 class StoryButtonData {
+  static bool defaultIsVisibleCallback() {
+    return true;
+  }
+
   /// This affects a border around button
   /// after the story was watched
   /// the border will disappear
@@ -214,6 +220,7 @@ class StoryButtonData {
   final double timelineThikness;
   final double timelineSpacing;
   final EdgeInsets? timlinePadding;
+  final IsVisibleCallback isVisibleCallback;
 
   /// Usualy this is required for the final story
   /// to pop it out to its button mosition
@@ -237,6 +244,9 @@ class StoryButtonData {
   /// [StoryWatchedContract.onStoryStart] the story will be marked as read
   /// right when you open it
   /// [segmentDuration] Duration of each segment in this story
+  /// [isVisibleCallback] if this callback returns false
+  /// the button will not appear in button list. It might be necessary
+  /// if you need to hide it for some reason
   StoryButtonData({
     this.storyWatchedContract = StoryWatchedContract.onStoryEnd,
     this.storyController,
@@ -246,6 +256,7 @@ class StoryButtonData {
     this.timlinePadding,
     this.inkFeatureFactory,
     this.pageAnimationCurve,
+    this.isVisibleCallback = defaultIsVisibleCallback,
     this.pageAnimationDuration,
     this.timelineFillColor = Colors.white,
     this.defaultCloseButtonColor = Colors.white,
