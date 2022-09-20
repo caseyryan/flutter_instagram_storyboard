@@ -1,4 +1,4 @@
-## 0.0.7
+## 0.0.8
 - Button list is disabled if buttonDatas is empty. In this case 
 - it will resurn SizedBox.shrink()
 ## 0.0.6
